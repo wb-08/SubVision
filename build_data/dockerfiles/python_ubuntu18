@@ -1,0 +1,8 @@
+FROM ubuntu:18.04
+
+RUN apt-get update
+RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
+RUN apt-get install ffmpeg libsm6 libxext6 libxrender-dev python3 python3-pip wget unzip  -y
+RUN pip3 install --upgrade pip
+ADD build_data/requirements/general.txt ./app/requirements.txt
+RUN pip3 install -r ./app/requirements.txt

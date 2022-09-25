@@ -1,0 +1,21 @@
+FROM nvidia/cuda:11.4.0-base-ubuntu20.04
+
+RUN apt update
+RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install tzdata
+RUN apt-get install ffmpeg libsm6 libxext6 libxrender-dev python3  \
+    python3-pip python3-tk  x11-xserver-utils tesseract-ocr tesseract-ocr  \
+    libtesseract-dev libleptonica-dev pkg-config wget unzip  -y
+
+ADD build_data/requirements/detector.txt ./app/requirements.txt
+RUN pip3 install -r ./app/requirements.txt
+RUN wget https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata  \
+    && mkdir /usr/local/share/tessdata/  \
+    &&  mv eng.traineddata /usr/local/share/tessdata/
+
+RUN mkdir -p ./crops
+COPY ./scripts ./app
+COPY ./model ./model
+ENV PYTHONPATH="/app"
+WORKDIR app/
+USER 1000:1000
+CMD python3 detector.py

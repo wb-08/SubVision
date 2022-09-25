@@ -1,0 +1,48 @@
+version: "3.0"
+services:
+
+  python_ubuntu18:
+    image: python_ubuntu18
+    build:
+      context: ../
+      dockerfile: build_data/dockerfiles/python_ubuntu18
+
+  detector:
+    image: detector
+    env_file:
+      - .env
+    build:
+      context: ../
+      dockerfile: build_data/dockerfiles/detector
+    volumes:
+      - '/tmp/.X11-unix:/tmp/.X11-unix'
+      - '../crops:/crops'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [ gpu ]
+
+  text_processing:
+    image: text_processing
+    env_file:
+      - .env
+    environment:
+      - HOST=detector
+    build:
+      context: ../
+      dockerfile: build_data/dockerfiles/text_processing
+
+  text_representation:
+    image: text_representation
+    env_file:
+      - .env
+    environment:
+      - HOST=text_processing
+    volumes:
+      - '/tmp/.X11-unix:/tmp/.X11-unix'
+      - '/run/user/1000/pulse/native:/run/user/1000/pulse/native'
+    build:
+      context: ../
+      dockerfile: build_data/dockerfiles/text_representation

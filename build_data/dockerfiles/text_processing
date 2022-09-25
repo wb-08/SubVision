@@ -1,0 +1,9 @@
+FROM python_ubuntu18
+
+ADD build_data/requirements/text_processing.txt ./app/requirements.txt
+RUN apt-get install -y libenchant1c2a build-essential manpages-dev
+RUN pip3 install -r ./app/requirements.txt
+COPY ./scripts ./app
+ENV PYTHONPATH="/app"
+WORKDIR app/
+CMD python3 text_processing.py
