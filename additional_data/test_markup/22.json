@@ -1,0 +1,26 @@
+{
+    "version": "5.0.1",
+    "flags": {},
+    "shapes": [
+        {
+            "label": "Subtitle",
+            "points": [
+                [
+                    135.69,
+                    723.33
+                ],
+                [
+                    836.2,
+                    818.0
+                ]
+            ],
+            "group_id": null,
+            "shape_type": "rectangle",
+            "flags": {}
+        }
+    ],
+    "imagePath": "../images/22.png",
+    "imageData": null,
+    "imageHeight": 1080,
+    "imageWidth": 1920
+}

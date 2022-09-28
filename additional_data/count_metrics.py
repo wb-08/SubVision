@@ -4,6 +4,10 @@ import fastwer
 import cv2
 import pytesseract
 from pytesseract import Output
+from paddleocr import PaddleOCR
+import easyocr
+import datetime
+
 
 os.environ['TESSDATA_PREFIX'] = '/usr/local/share/tessdata/'
 subtitle_folder = 'test_markup/'
@@ -58,14 +62,29 @@ def image_processing(image):
     return dilate_image
 
 
-def text_recognition(image):
+def text_recognition_tesseract(image):
     """
     extracting text from the image
     """
     dilate_image = image_processing(image)
     text = pytesseract.image_to_string(dilate_image, lang='eng', config=r'--psm 3 --oem 2',
                                        output_type=Output.DICT)['text']
-    clean_text = "".join([str(i.lower()) for i in text.splitlines()])
+    clean_text = " ".join([str(i.lower()) for i in text.splitlines()]).strip()
+    return clean_text
+
+
+def text_recognition_easyocr(image, reader):
+    dilate_image = image_processing(image)
+    text = reader.readtext(dilate_image, detail=0)
+    clean_text = " ".join([str(i.lower()) for i in text]).strip()
+    return clean_text
+
+
+def text_recognition_paddleocr(image, reader):
+    dilate_image = image_processing(image)
+    result = reader.ocr(dilate_image, cls=True, )
+    text = [line[1][0] for line in result]
+    clean_text = " ".join([str(i.lower()) for i in text]).strip()
     return clean_text
 
 
@@ -90,10 +109,26 @@ def calculate(ref, output):
 
 
 if __name__ == '__main__':
+
+    cer_list = []
+    wer_list = []
+    # easyocr
+    #reader = easyocr.Reader(['en'])
+    # PaddleOCR
+    reader = PaddleOCR(lang='en')
+    start = datetime.datetime.now()
     for subtitle_file in os.listdir(subtitle_folder):
         bboxes = extract_bboxes(subtitle_folder+subtitle_file)
         image_name = subtitle_file.split('.')[0] + '.png'
         subtitle_image = crop_image(image_folder+image_name, bboxes)
-        output_text = text_recognition(subtitle_image)
+        # output_text = text_recognition_tesseract(subtitle_image)
+        # output_text = text_recognition_easyocr(subtitle_image, reader)
+        output_text = text_recognition_paddleocr(subtitle_image, reader)
         ref_text = extract_reference_text(check_file, image_name)
         cer, wer = calculate(ref_text, output_text)
+        cer_list.append(cer)
+        wer_list.append(wer)
+    print("Time:"+str(datetime.datetime.now() - start))
+    print("Avg CER:"+str(sum(cer_list)/len(cer_list)))
+    print("Avg WER:"+str(sum(wer_list) / len(wer_list)))
+
