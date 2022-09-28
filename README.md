@@ -1,5 +1,5 @@
 # SubVision
- Automatic subtitle dubbing on YouTube from English to Russian using computer vision
+ Automatic subtitle translate and dubbing on YouTube from English to Russian using computer vision
 
 
 <div align="center">
