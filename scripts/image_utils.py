@@ -78,8 +78,6 @@ def find_text_bboxes(image):
         if avg_width-find_numerical_error_rate(avg_width, error=100) < w < avg_width+find_numerical_error_rate(avg_width) and \
            avg_height-find_numerical_error_rate(avg_height, error=25) < h < avg_height+find_numerical_error_rate(avg_height):
             right_contours.append([x, y, w, h])
-        else:
-            cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 0), -1)
 
     max_letter_height = min([y for x, y, w, h in right_contours ])
     min_letter_height = max([y+h for x, y, w, h in right_contours ])
