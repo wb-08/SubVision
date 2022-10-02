@@ -31,18 +31,18 @@ def image_processing(image, only_dilate=False, make_border=False, iterations=1):
     """
     if only_dilate:
         structuring_element = np.ones((1, 2), np.uint8)
-        dilate_image = cv2.dilate(image, structuring_element, iterations=iterations)
+        transformation_image = cv2.dilate(image, structuring_element, iterations=iterations)
 
         if make_border:
-            dilate_image = cv2.copyMakeBorder(dilate_image, 2, 2, 1, 1, cv2.BORDER_CONSTANT, None, value=0)
+            transformation_image = cv2.copyMakeBorder(transformation_image, 2, 2, 1, 1, cv2.BORDER_CONSTANT, None, value=0)
 
     else:
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, 1))
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         _, thresh_img = cv2.threshold(gray, 200, 255,
                                   cv2.THRESH_BINARY)
-        dilate_image = cv2.morphologyEx(thresh_img, cv2.MORPH_OPEN, kernel, iterations=1)
-    return dilate_image
+        transformation_image = cv2.morphologyEx(thresh_img, cv2.MORPH_OPEN, kernel, iterations=1)
+    return transformation_image
 
 
 def get_recent_images():
@@ -81,7 +81,7 @@ def find_text_bboxes(image):
         else:
             cv2.rectangle(image, (x, y), (x+w, y+h), (0, 0, 0), -1)
 
-    max_letter_height = min([y for x, y, w, h in right_contours ])
+    max_letter_height = min([y for x, y, w, h in right_contours])
     min_letter_height = max([y+h for x, y, w, h in right_contours ])
     min_letter_width = min([x for x, y, w, h in right_contours])
     image = image[max_letter_height:min_letter_height, min_letter_width:image.shape[1]]
